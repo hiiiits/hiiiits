@@ -1,0 +1,20 @@
+{
+  "tasks": {
+    "dev": "deno run --allow-net --watch main.ts",
+    "test": "deno test test.ts"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "lib": ["deno.window"],
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  },
+  "fmt": {
+    "useTabs": true,
+    "lineWidth": 160,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": false,
+    "include": ["main.ts", "test.ts", "src/"]
+  }
+}
