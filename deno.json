@@ -1,0 +1,21 @@
+{
+  "tasks": {
+    "dev": "deno run --unstable -A --watch main.ts",
+    "test": "deno test --unstable -A test/app.ts"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "lib": ["deno.window", "deno.unstable"],
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  },
+  "fmt": {
+    "useTabs": true,
+    "lineWidth": 144,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": true,
+    "include": ["main.ts", "src", "test"]
+  },
+  "importMap": "./import_map.json"
+}
