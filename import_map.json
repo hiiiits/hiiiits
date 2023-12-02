@@ -2,6 +2,8 @@
   "imports": {
     "~/": "./src/",
     "std/assert/": "https://deno.land/std@0.208.0/assert/",
-    "hono/": "https://deno.land/x/hono@v3.10.3/"
+    "std/testing/": "https://deno.land/std@0.208.0/testing/",
+    "dayjs": "https://esm.sh/dayjs@1.11.10",
+    "hono/": "https://deno.land/x/hono@v3.10.4/"
   }
 }

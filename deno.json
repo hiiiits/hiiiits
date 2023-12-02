@@ -11,7 +11,7 @@
   },
   "fmt": {
     "useTabs": true,
-    "lineWidth": 144,
+    "lineWidth": 178,
     "indentWidth": 2,
     "semiColons": true,
     "singleQuote": true,
