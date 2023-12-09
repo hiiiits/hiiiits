@@ -4,13 +4,15 @@ import type { Context } from 'hono/mod.ts';
 import type * as Types from '~/types.ts';
 import * as config from '~/config.ts';
 
+const badRequest = (message: string) => new HTTPException(400, { message });
+
 export const secret = (ctx: Context) => {
-	if (ctx.req.query('secret') !== Deno.env.get('SECRET')) throw new HTTPException(400, { message: 'Invalid secret' });
+	if (ctx.req.query('secret') !== Deno.env.get('SECRET')) throw badRequest('Invalid secret');
 };
 
-const createRegExpValid = (regexp: RegExp, errorMessage?: string) => (value: unknown): string => {
+const createRegExpValid = (regexp: RegExp, errorMessage: string) => (value: unknown): string => {
 	if (typeof value === 'string' && regexp.test(value)) return value;
-	throw new HTTPException(400, { message: errorMessage });
+	throw badRequest(errorMessage);
 };
 
 export const validUsername = createRegExpValid(/^[a-zA-Z\d](?:[a-zA-Z\d]|-(?=[a-zA-Z\d])){0,38}$/, 'Invalid username');

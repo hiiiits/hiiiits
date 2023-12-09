@@ -170,28 +170,28 @@ Deno.test('/works', async () => {
 		ft.restore();
 		ft = new FakeTime();
 
-		for (let i = 0; i < 1000; i++) {
+		for (let i = 0; i < 1441; i++) {
 			tickDaily();
 			await api.hit('hiiiits', 'hiiiits');
 		}
 		await api['~'].value('hiiiits', 'hiiiits')({
-			total: 1000,
-			yearlySize: 4,
-			monthlySize: 24,
-			dailySize: 90,
-			timestampsLength: 999,
+			total: 1441,
+			yearlySize: 5,
+			monthlySize: 48,
+			dailySize: 360,
+			timestampsLength: 1440,
 		});
 
-		for (let i = 0; i < 120; i++) {
+		for (let i = 0; i < 200; i++) {
 			tickMonthly();
 			await api.hit('hiiiits', 'hiiiits');
 		}
 		await api['~'].value('hiiiits', 'hiiiits')({
-			total: 1120,
+			total: 1641,
 			yearlySize: 10,
-			monthlySize: 24,
-			dailySize: 3,
-			timestampsLength: 999,
+			monthlySize: 60,
+			dailySize: 12,
+			timestampsLength: 1440,
 		});
 	} finally {
 		ft.restore();
