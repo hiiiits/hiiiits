@@ -11,8 +11,7 @@ export const secret = (ctx: Context) => {
 };
 
 export const userAgent = (ctx: Context) => {
-	const header = ctx.req.header('user-agent');
-	if (typeof header !== 'string' || !header.toLowerCase().includes('github-camo')) throw new Error('Invalid user-agent');
+	if (!(ctx.req.header('user-agent')?.toLowerCase().includes('github-camo'))) throw badRequest('Invalid user-agent');
 };
 
 const createRegExpValid = (regexp: RegExp, errorMessage: string) => (value: unknown): string => {
