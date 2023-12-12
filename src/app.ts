@@ -16,11 +16,10 @@ const kv = await Deno.openKv();
 const app = new Hono().use('*', cors({ origin: '*' }), compress(), secureHeaders({ crossOriginResourcePolicy: false }));
 
 app.get('/hit/:u/:r', async (ctx) => {
-	utils.userAgent(ctx);
-
 	let body: string = svg.success;
 
 	try {
+		utils.userAgent(ctx);
 		const key = utils.createKeyFromParam(ctx.req.param());
 
 		try {

@@ -41,28 +41,34 @@ const validValue = (value: unknown) => {
 	return value as Types.Value;
 };
 
+const HEADER_SVG = {
+	'Content-Type': 'image/svg+xml',
+} as const;
+
+const HEADER_JSON = {
+	'Content-Type': 'application/json; charset=UTF-8',
+} as const;
+
 const api = {
-	hit: async (username: string, repository: string) => {
-		assertEquals(
-			await ((await request(`/hit/${username}/${repository}`))({
-				status: 200,
-				headers: {
-					'Content-Type': 'image/svg+xml',
-				},
-			})).text(),
-			svg.success,
-		);
+	hit: {
+		success: async (username: string, repository: string) => {
+			assertEquals(
+				await ((await request(`/hit/${username}/${repository}`))({ status: 200, headers: HEADER_SVG })).text(),
+				svg.success,
+			);
+		},
+		warning: async (username: string, repository: string) => {
+			assertEquals(
+				await ((await request(`/hit/${username}/${repository}`, { headers: {} }))({ status: 200, headers: HEADER_SVG })).text(),
+				svg.warning,
+			);
+		},
 	},
 	'~': {
 		counts: (username: string) => {
 			return async (json: Record<string, number>) => {
 				assertEquals(
-					await ((await request(`/~/counts/${username}`))({
-						status: 200,
-						headers: {
-							'Content-Type': 'application/json; charset=UTF-8',
-						},
-					})).json(),
+					await ((await request(`/~/counts/${username}`))({ status: 200, headers: HEADER_JSON })).json(),
 					json,
 				);
 			};
@@ -70,12 +76,7 @@ const api = {
 		value: (username: string, repository: string) => {
 			return async (options: { total: number; yearlySize: number; monthlySize: number; dailySize: number; timestampsLength: number }) => {
 				const value = validValue(
-					await ((await request(`/~/value/${username}/${repository}`))({
-						status: 200,
-						headers: {
-							'Content-Type': 'application/json; charset=UTF-8',
-						},
-					})).json(),
+					await ((await request(`/~/value/${username}/${repository}`))({ status: 200, headers: HEADER_JSON })).json(),
 				);
 
 				const [total, yearly, monthly, daily, timestamps] = value;
@@ -89,12 +90,7 @@ const api = {
 		},
 		delete: async (username: string, repository: string) => {
 			assertEquals(
-				await ((await request(`/~/delete/${username}/${repository}`, { method: 'DELETE' }))({
-					status: 200,
-					headers: {
-						'Content-Type': 'application/json; charset=UTF-8',
-					},
-				})).json(),
+				await ((await request(`/~/delete/${username}/${repository}`, { method: 'DELETE' }))({ status: 200, headers: HEADER_JSON })).json(),
 				{ message: 'deleted' },
 			);
 		},
@@ -106,15 +102,15 @@ Deno.test('/works', async () => {
 
 	await api['~'].counts('hiiiits')({});
 
-	await api.hit('hiiiits', 'hiiiits');
+	await api.hit.success('hiiiits', 'hiiiits');
 
 	await api['~'].counts('hiiiits')({
 		['hiiiits']: 1,
 	});
 
-	await api.hit('hiiiits', 'dash');
-	await api.hit('hiiiits', 'deno');
-	await api.hit('hiiiits', 'hiiiits');
+	await api.hit.success('hiiiits', 'dash');
+	await api.hit.success('hiiiits', 'deno');
+	await api.hit.success('hiiiits', 'hiiiits');
 
 	await api['~'].counts('hiiiits')({
 		['hiiiits']: 2,
@@ -122,7 +118,7 @@ Deno.test('/works', async () => {
 		['deno']: 1,
 	});
 
-	await api.hit('hiiiits', 'hiiiits');
+	await api.hit.success('hiiiits', 'hiiiits');
 	await api['~'].delete('hiiiits', 'dash');
 	await api['~'].delete('hiiiits', 'deno');
 
@@ -140,11 +136,11 @@ Deno.test('/works', async () => {
 	const tickMonthly = () => ft.tick(2_592_000_000);
 
 	try {
-		await api.hit('hiiiits', 'hiiiits');
+		await api.hit.success('hiiiits', 'hiiiits');
 
 		for (let i = 0; i < 24; i++) {
 			tickHourly();
-			await api.hit('hiiiits', 'hiiiits');
+			await api.hit.success('hiiiits', 'hiiiits');
 		}
 		await api['~'].value('hiiiits', 'hiiiits')({
 			total: 25,
@@ -155,7 +151,7 @@ Deno.test('/works', async () => {
 		});
 		for (let i = 0; i < 30; i++) {
 			tickDaily();
-			await api.hit('hiiiits', 'hiiiits');
+			await api.hit.success('hiiiits', 'hiiiits');
 		}
 		await api['~'].value('hiiiits', 'hiiiits')({
 			total: 55,
@@ -172,7 +168,7 @@ Deno.test('/works', async () => {
 
 		for (let i = 0; i < 1441; i++) {
 			tickDaily();
-			await api.hit('hiiiits', 'hiiiits');
+			await api.hit.success('hiiiits', 'hiiiits');
 		}
 		await api['~'].value('hiiiits', 'hiiiits')({
 			total: 1441,
@@ -184,7 +180,7 @@ Deno.test('/works', async () => {
 
 		for (let i = 0; i < 200; i++) {
 			tickMonthly();
-			await api.hit('hiiiits', 'hiiiits');
+			await api.hit.success('hiiiits', 'hiiiits');
 		}
 		await api['~'].value('hiiiits', 'hiiiits')({
 			total: 1641,
@@ -196,24 +192,16 @@ Deno.test('/works', async () => {
 	} finally {
 		ft.restore();
 	}
+
+	await api.hit.warning('hiiiits', 'hiiiits');
 });
 
 Deno.test('/', async () => {
-	const response = (await request(`/`))({
-		status: 200,
-		headers: {
-			'Content-Type': 'application/json; charset=UTF-8',
-		},
-	});
+	const response = (await request(`/`))({ status: 200, headers: HEADER_JSON });
 	assertEquals(await response.json(), { name: 'hiiiits' });
 });
 
 Deno.test('/404', async () => {
-	const response = (await request(`/404`))({
-		status: 404,
-		headers: {
-			'Content-Type': 'application/json; charset=UTF-8',
-		},
-	});
+	const response = (await request(`/404`))({ status: 404, headers: HEADER_JSON });
 	assertEquals(await response.json(), { message: 'Not found' });
 });
