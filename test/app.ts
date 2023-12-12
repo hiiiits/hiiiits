@@ -7,8 +7,8 @@ import * as svg from '~/svg.ts';
 
 const kv = await Deno.openKv();
 
-const request = async (input: RequestInfo | URL, requestInit?: RequestInit) => {
-	const response = await app.request(input, requestInit);
+const request = async (input: RequestInfo | URL, requestInit: RequestInit = {}) => {
+	const response = await app.request(input, { headers: { 'User-Agent': 'github-camo' }, ...requestInit });
 	return ({ status, headers }: {
 		status?: number;
 		headers?: {

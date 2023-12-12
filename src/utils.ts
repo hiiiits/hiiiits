@@ -10,6 +10,11 @@ export const secret = (ctx: Context) => {
 	if (ctx.req.query('secret') !== Deno.env.get('SECRET')) throw badRequest('Invalid secret');
 };
 
+export const userAgent = (ctx: Context) => {
+	const header = ctx.req.header('user-agent');
+	if (typeof header !== 'string' || !header.toLowerCase().includes('github-camo')) throw new Error('Invalid user-agent');
+};
+
 const createRegExpValid = (regexp: RegExp, errorMessage: string) => (value: unknown): string => {
 	if (typeof value === 'string' && regexp.test(value)) return value;
 	throw badRequest(errorMessage);
